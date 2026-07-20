@@ -1,0 +1,96 @@
+.return-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  max-width: 36rem;
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  animation: success-in 320ms ease both;
+}
+
+@keyframes success-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.return-success__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.return-success h1 {
+  font-size: 1.75rem;
+}
+
+.return-success__copy {
+  color: var(--muted);
+}
+
+.return-success__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0.35rem 0 0.5rem;
+  width: 100%;
+}
+
+.return-success__meta div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.return-success__meta dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.return-success__meta dd {
+  margin: 0;
+}
+
+.return-success__meta code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  background: var(--brand-soft);
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+}
+
+.return-success__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-control);
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.return-success__cta:hover {
+  background: var(--brand-hover);
+  color: #fff;
+}

@@ -1,0 +1,128 @@
+/* solvpath brand tokens — drop in and reference these variables, or map into your theme. */
+:root {
+  /* Primary (deep navy) — primary buttons & chrome; use white text on it */
+  --brand: #0e2c3e;
+  --brand-hover: #17394e;
+  --brand-soft: #e7f0f3;
+
+  /* Accent (teal) — active states, focus, selection, highlights */
+  --accent: #28b0c8;
+  --accent-deep: #0c6e80; /* use for teal text / links (contrast-safe on white) */
+  --accent-soft: #e4f5f8;
+
+  /* Neutrals */
+  --ink: #0b2430; /* body text        */
+  --muted: #566671; /* secondary text   */
+  --line: #e2e8eb; /* borders/dividers */
+  --canvas: #f4f7f9; /* page background  */
+  --surface: #ffffff; /* cards            */
+
+  /* Status (text + soft background) */
+  --success: #127a3b;
+  --success-soft: #e7f7ed; /* delivered   */
+  --info: #1d4ed8;
+  --info-soft: #e7eeff; /* in transit  */
+  --warning: #b45309;
+  --warning-soft: #fbf0de; /* processing  */
+  --danger: #b91c1c;
+  --danger-soft: #fcebeb; /* cancelled   */
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --shadow-soft: 0 1px 2px rgb(11 36 48 / 4%), 0 8px 24px rgb(11 36 48 / 6%);
+  --font-sans: "Inter", system-ui, sans-serif;
+  --max-width: 960px;
+  --header-height: 64px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 100% -20%, rgb(40 176 200 / 12%), transparent),
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgb(14 44 62 / 6%), transparent),
+    var(--canvas);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: var(--accent-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--brand);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 14rem;
+  color: var(--muted);
+}
+
+.page-status--start {
+  align-items: stretch;
+}

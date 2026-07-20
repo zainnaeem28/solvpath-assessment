@@ -1,0 +1,30 @@
+.search-field {
+  position: relative;
+  width: 100%;
+}
+
+.search-field .field__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.search-field__icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-field__input .field__control {
+  padding-left: 2.35rem;
+}

@@ -1,0 +1,23 @@
+.error-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-card);
+  border: 1px solid rgb(185 28 28 / 20%);
+  background: var(--danger-soft);
+}
+
+.error-banner__title {
+  display: block;
+  font-size: 0.9375rem;
+  color: var(--danger);
+}
+
+.error-banner__message {
+  margin-top: 0.2rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+}

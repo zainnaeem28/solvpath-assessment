@@ -1,0 +1,43 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--line);
+  background: rgb(255 255 255 / 88%);
+  backdrop-filter: blur(10px);
+}
+
+.app-header__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.app-header__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.app-header__logo {
+  height: 1.75rem;
+  width: auto;
+}
+
+.app-header__tagline {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+@media (max-width: 520px) {
+  .app-header__tagline {
+    display: none;
+  }
+}
