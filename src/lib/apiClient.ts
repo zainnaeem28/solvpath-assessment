@@ -24,17 +24,15 @@ function wait(ms: number, signal?: AbortSignal) {
 function isRetryable(err: unknown): boolean {
   if (err instanceof DOMException && err.name === "AbortError") return false;
   if (err instanceof ApiError) return err.status >= 500 || err.status === 429;
-  return true;
+  // Unknown / programmer errors should fail fast; network TypeErrors may retry.
+  return err instanceof TypeError;
 }
 
 /**
  * Retry transient API failures. Does not change mockApi behavior —
  * it just handles flaky networks the way a real client should.
  */
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options: RetryOptions = {},
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
   const retries = options.retries ?? 2;
   const delayMs = options.delayMs ?? 400;
   let attempt = 0;

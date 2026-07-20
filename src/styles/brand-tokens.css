@@ -1,27 +1,31 @@
 /* solvpath brand tokens — drop in and reference these variables, or map into your theme. */
 :root {
   /* Primary (deep navy) — primary buttons & chrome; use white text on it */
-  --brand: #0E2C3E;
-  --brand-hover: #17394E;
-  --brand-soft: #E7F0F3;
+  --brand: #0e2c3e;
+  --brand-hover: #17394e;
+  --brand-soft: #e7f0f3;
 
   /* Accent (teal) — active states, focus, selection, highlights */
-  --accent: #28B0C8;
-  --accent-deep: #0C6E80; /* use for teal text / links (contrast-safe on white) */
-  --accent-soft: #E4F5F8;
+  --accent: #28b0c8;
+  --accent-deep: #0c6e80; /* use for teal text / links (contrast-safe on white) */
+  --accent-soft: #e4f5f8;
 
   /* Neutrals */
-  --ink: #0B2430;      /* body text        */
-  --muted: #566671;    /* secondary text   */
-  --line: #E2E8EB;     /* borders/dividers */
-  --canvas: #F4F7F9;   /* page background  */
-  --surface: #FFFFFF;  /* cards            */
+  --ink: #0b2430; /* body text        */
+  --muted: #566671; /* secondary text   */
+  --line: #e2e8eb; /* borders/dividers */
+  --canvas: #f4f7f9; /* page background  */
+  --surface: #ffffff; /* cards            */
 
   /* Status (text + soft background) */
-  --success: #127A3B;  --success-soft: #E7F7ED; /* delivered   */
-  --info: #1D4ED8;     --info-soft: #E7EEFF;    /* in transit  */
-  --warning: #B45309;  --warning-soft: #FBF0DE; /* processing  */
-  --danger: #B91C1C;   --danger-soft: #FCEBEB;  /* cancelled   */
+  --success: #127a3b;
+  --success-soft: #e7f7ed; /* delivered   */
+  --info: #1d4ed8;
+  --info-soft: #e7eeff; /* in transit  */
+  --warning: #b45309;
+  --warning-soft: #fbf0de; /* processing  */
+  --danger: #b91c1c;
+  --danger-soft: #fcebeb; /* cancelled   */
 
   --radius-card: 16px;
   --font-sans: "Inter", system-ui, sans-serif;

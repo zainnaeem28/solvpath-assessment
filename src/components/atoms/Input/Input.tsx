@@ -7,14 +7,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export function Input({
-  id,
-  label,
-  hint,
-  error,
-  className = "",
-  ...rest
-}: InputProps) {
+export function Input({ id, label, hint, error, className = "", ...rest }: InputProps) {
   const inputId = id ?? rest.name;
 
   return (
@@ -24,9 +17,7 @@ export function Input({
         id={inputId}
         className={`field__control${error ? " field__control--error" : ""}`}
         aria-invalid={error ? true : undefined}
-        aria-describedby={
-          error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
-        }
+        aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
         {...rest}
       />
       {error ? (

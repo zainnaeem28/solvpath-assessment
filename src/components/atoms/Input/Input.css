@@ -19,11 +19,14 @@
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--ink);
-  transition: border-color 140ms ease, box-shadow 140ms ease;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .field__control::placeholder {
-  color: var(--muted);
+  color: #7a8b96;
+  opacity: 1;
 }
 
 .field__control:hover:not(:disabled) {

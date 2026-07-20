@@ -13,15 +13,9 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
 }
 
-export function Select({
-  id,
-  label,
-  options,
-  error,
-  className = "",
-  ...rest
-}: SelectProps) {
+export function Select({ id, label, options, error, className = "", ...rest }: SelectProps) {
   const selectId = id ?? rest.name;
+  const errorId = selectId ? `${selectId}-error` : undefined;
 
   return (
     <label className={`field ${className}`.trim()} htmlFor={selectId}>
@@ -30,6 +24,7 @@ export function Select({
         id={selectId}
         className={`field__control${error ? " field__control--error" : ""}`}
         aria-invalid={error ? true : undefined}
+        aria-describedby={error && errorId ? errorId : undefined}
         {...rest}
       >
         {options.map((option) => (
@@ -39,7 +34,7 @@ export function Select({
         ))}
       </select>
       {error ? (
-        <span className="field__error" role="alert">
+        <span id={errorId} className="field__error" role="alert">
           {error}
         </span>
       ) : null}

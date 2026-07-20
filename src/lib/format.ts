@@ -14,8 +14,6 @@ export function formatDate(isoDate: string): string {
   }).format(date);
 }
 
-export function orderTotalCents(
-  items: { unitPriceCents: number; quantity: number }[],
-): number {
+export function orderTotalCents(items: { unitPriceCents: number; quantity: number }[]): number {
   return items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 }

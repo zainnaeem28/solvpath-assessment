@@ -8,12 +8,7 @@ export interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export function EmptyState({
-  title,
-  description,
-  actionLabel,
-  onAction,
-}: EmptyStateProps) {
+export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
     <div className="empty-state" role="status">
       <div className="empty-state__mark" aria-hidden />
