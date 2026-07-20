@@ -65,11 +65,11 @@ Orders search runs client-side on the loaded catalog (`filterAndPaginateOrders`)
 
 ## Mobile view
 
-<video src="./docs/demo-mobile.mp4" controls playsinline width="280"></video>
+![Mobile demo](./docs/demo-mobile.gif)
 
 ## Desktop view
 
-<video src="./docs/demo-desktop.mp4" controls playsinline width="100%"></video>
+![Desktop demo](./docs/demo-desktop.gif)
 
 ## Notes for reviewers
 
