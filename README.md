@@ -4,6 +4,9 @@ Senior front-end take-home. Browse orders and complete a guided return or exchan
 
 **Stack:** React 19, TypeScript, Vite, React Router, Zustand, Recharts, Vitest, Storybook, CSS tokens
 
+**Live app:** https://zainnaeem28.github.io/solvpath-assessment/  
+**Storybook:** https://zainnaeem28.github.io/solvpath-assessment/storybook/
+
 ## Run
 
 ```bash
@@ -72,9 +75,6 @@ Orders search runs client-side on the loaded catalog (`filterAndPaginateOrders`)
 ![Desktop demo](./docs/demo-desktop.gif)
 
 ## Deploy
-
-Live app: https://zainnaeem28.github.io/solvpath-assessment/  
-Storybook: https://zainnaeem28.github.io/solvpath-assessment/storybook/
 
 Pushing to `main` runs `.github/workflows/deploy-pages.yml` and publishes the app plus Storybook.
 
