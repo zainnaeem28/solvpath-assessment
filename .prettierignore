@@ -1,0 +1,9 @@
+dist
+storybook-static
+coverage
+node_modules
+helping
+pnpm-lock.yaml
+package-lock.json
+*.min.js
+docs/*.png
