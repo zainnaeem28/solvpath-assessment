@@ -73,12 +73,10 @@ Orders search runs client-side on the loaded catalog (`filterAndPaginateOrders`)
 
 ## Deploy
 
-Yes — this app can deploy on **GitHub Pages**. The “API” is the in-browser mock (`src/api/mockApi.ts`), so no backend is required.
+Live app: https://zainnaeem28.github.io/solvpath-assessment/  
+Storybook: https://zainnaeem28.github.io/solvpath-assessment/storybook/
 
-Live URL (after Pages is enabled):  
-https://zainnaeem28.github.io/solvpath-assessment/
-
-Pushing to `main` runs `.github/workflows/deploy-pages.yml` and publishes the Vite build.
+Pushing to `main` runs `.github/workflows/deploy-pages.yml` and publishes the app plus Storybook.
 
 One-time setup if Pages is not enabled yet:
 

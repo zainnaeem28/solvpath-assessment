@@ -12,6 +12,9 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(config) {
+    if (process.env.GITHUB_PAGES === "true") {
+      config.base = "/solvpath-assessment/storybook/";
+    }
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {
       ...config.resolve.alias,
