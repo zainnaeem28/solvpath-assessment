@@ -71,8 +71,30 @@ Orders search runs client-side on the loaded catalog (`filterAndPaginateOrders`)
 
 ![Desktop demo](./docs/demo-desktop.gif)
 
+## Deploy
+
+Yes — this app can deploy on **GitHub Pages**. The “API” is the in-browser mock (`src/api/mockApi.ts`), so no backend is required.
+
+Live URL (after Pages is enabled):  
+https://zainnaeem28.github.io/solvpath-assessment/
+
+Pushing to `main` runs `.github/workflows/deploy-pages.yml` and publishes the Vite build.
+
+One-time setup if Pages is not enabled yet:
+
+1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**
+2. Push to `main` (or run the **Deploy GitHub Pages** workflow manually)
+
+Local production build:
+
+```bash
+pnpm run build:pages
+pnpm run preview
+```
+
 ## Notes for reviewers
 
 - Mock API contract is unchanged (`src/api/mockApi.ts`)
 - Returns are only available on **delivered** orders
 - Money is handled in integer cents
+- Deployed build uses the same mock data and latency/failure behavior
