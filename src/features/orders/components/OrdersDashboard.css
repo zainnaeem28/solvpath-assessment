@@ -1,16 +1,22 @@
+.orders-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
 .orders {
   display: flex;
   flex-direction: column;
   gap: 1.15rem;
 }
 
-.orders__intro h1 {
-  font-size: clamp(1.65rem, 3vw, 1.95rem);
+.orders__intro h2 {
+  font-size: clamp(1.25rem, 2.5vw, 1.45rem);
   font-weight: 750;
 }
 
 .orders__intro p {
-  margin-top: 0.4rem;
+  margin-top: 0.35rem;
   color: var(--muted);
   max-width: 42ch;
 }

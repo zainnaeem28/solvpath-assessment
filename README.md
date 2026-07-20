@@ -24,7 +24,7 @@ Optional demo sign-in lives at `/login` (`maya.chen@example.com` / `jordan.lee@e
 
 ## What's included
 
-1. **Orders dashboard** — searchable, status-filtered, paginated order list with loading skeletons, empty state, and retryable errors.
+1. **Orders dashboard** — Horizon-style overview (metric cards, spend area chart, status donut, throughput bars) plus the searchable / filterable / paginated order list.
 2. **Return / exchange flow** — items → reason → resolution (incl. exchange size/color) → review → submit.
 3. **Draft persistence** — in-progress returns survive refresh.
 4. **Resilient API client** — automatic retries for transient mock failures (without changing `mockApi` behavior).
