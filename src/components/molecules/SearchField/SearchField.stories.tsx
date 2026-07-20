@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { SearchField } from "./SearchField";
 
 const meta = {
@@ -10,20 +10,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+function InteractiveSearchField(args: ComponentProps<typeof SearchField>) {
+  const [value, setValue] = useState(args.value);
+  return <SearchField {...args} value={value} onChange={setValue} />;
+}
+
 export const Default: Story = {
   args: {
     value: "aurora",
     onChange: () => undefined,
     placeholder: "Search by order number or product",
   },
-  render: (args) => {
-    const [value, setValue] = useState(args.value);
-    return (
-      <SearchField
-        {...args}
-        value={value}
-        onChange={setValue}
-      />
-    );
-  },
+  render: (args) => <InteractiveSearchField {...args} />,
 };
