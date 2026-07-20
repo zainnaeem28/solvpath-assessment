@@ -24,6 +24,12 @@ describe("withRetry", () => {
     await expect(withRetry(fn, { retries: 2, delayMs: 1 })).rejects.toThrow("missing");
     expect(fn).toHaveBeenCalledTimes(1);
   });
+
+  it("does not retry generic Error", async () => {
+    const fn = vi.fn().mockRejectedValue(new Error("boom"));
+    await expect(withRetry(fn, { retries: 2, delayMs: 1 })).rejects.toThrow("boom");
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("toUserMessage", () => {

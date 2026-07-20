@@ -5,10 +5,7 @@ import {
   calculateReturnSubtotalCents,
   calculateStoreCreditCents,
 } from "@/features/returns/lib/money";
-import {
-  getExchangeInventory,
-  validateReturnStep,
-} from "@/features/returns/lib/validation";
+import { getExchangeInventory, validateReturnStep } from "@/features/returns/lib/validation";
 
 const items: OrderItem[] = [
   {
@@ -108,8 +105,7 @@ describe("validateReturnStep", () => {
   it("accepts a complete exchange selection that is in stock", () => {
     const inventory = getExchangeInventory(items[0]!);
     const size = inventory.sizes[0]!;
-    const color =
-      inventory.colors.find((c) => inventory.inStock(size, c)) ?? inventory.colors[0]!;
+    const color = inventory.colors.find((c) => inventory.inStock(size, c)) ?? inventory.colors[0]!;
 
     const errors = validateReturnStep({
       step: "resolution",
