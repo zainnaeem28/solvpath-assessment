@@ -1,72 +1,78 @@
-# solvpath — Senior Front-End take-home
+# solvpath
 
-Customer-facing post-purchase app: browse orders, then complete a guided return / exchange.
+Senior front-end take-home. Browse orders and complete a guided return or exchange.
 
-**Stack:** React 19 · TypeScript · Vite · React Router · Zustand · Vitest · Storybook · CSS (brand tokens)
+**Stack:** React 19, TypeScript, Vite, React Router, Zustand, Recharts, Vitest, Storybook, CSS tokens
 
-## Install → run
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`).
+Also useful:
 
 ```bash
 npm run build
-npm run preview
 npm test
+npm run lint
+npm run format
 npm run storybook
 ```
 
-Optional demo sign-in lives at `/login` (`maya.chen@example.com` / `jordan.lee@example.com`) — not required to use orders or returns.
+Demo sign-in (optional): `/login`  
+`maya.chen@example.com` or `jordan.lee@example.com`
 
-## What's included
+## Features
 
-1. **Orders dashboard** — Horizon-style overview (metric cards, spend area chart, status donut, throughput bars) plus the searchable / filterable / paginated order list.
-2. **Return / exchange flow** — items → reason → resolution (incl. exchange size/color) → review → submit.
-3. **Draft persistence** — in-progress returns survive refresh.
-4. **Resilient API client** — automatic retries for transient mock failures (without changing `mockApi` behavior).
-5. **Money math** — integer cents; store credit **+10%** (`Math.round(subtotal * 1.1)`).
-6. **Vitest** + **Storybook** for shared UI pieces.
+- Orders overview with search, status filters, and pagination
+- Return / exchange flow for delivered orders (refund, exchange, store credit +10%)
+- Draft persistence and offline return queue
+- Resilient API client (retries around the flaky mock API)
+- Storybook for shared UI
+
+## Code style
+
+- ❤️ **ESLint**: `npm run lint` (fix with `npm run lint:fix`)
+- ❤️ **Prettier**: `npm run format` (check with `npm run format:check`)
 
 ## Architecture
 
-Feature modules first; light atomic UI for shared presentational components.
+![solvpath app architecture](./docs/architecture.png)
+
+Feature modules (`auth`, `orders`, `returns`) plus light atomic UI (`atoms` → `molecules` → `organisms` → `templates`).
 
 ```text
 src/
 ├── api/mockApi.ts
-├── components/{atoms,molecules,organisms,templates}
-├── features/{auth,orders,returns}
+├── components/
+├── features/
 ├── pages/
 └── styles/
 ```
 
-## Decision log
+## Search
 
-### Chose to build
-- Brief-first UX: calm customer account surface (Shop / Amazon returns inspired), not an admin analytics dashboard
-- Auto-retry (2 attempts) around `listOrders` / `getOrder` / `submitReturn` so intermittent mock failures feel recoverable
-- Status chips + deferred search + skeletons for perceived performance
-- Step validation, store-credit bonus math, exchange inventory selection
-- Offline return queue when `navigator.onLine` is false
+![What search matches](./docs/search-basis.png)
 
-### Deliberately skipped
-- Forced authentication (brief says it isn’t required)
-- Pixel-matching an external Figma admin dashboard — wrong product surface for this brief
-- Exhaustive E2E suite
+Orders search runs client-side on the loaded catalog (`filterAndPaginateOrders`), matching the mock API rules:
 
-### Trade-offs
-- Mock API failure rates left at starter values; resilience is client-side retry, not muted randomness
-- Exchange preferences appended into `reason` because `ReturnRequest` has no dedicated field
-- CSS co-located with components so brand tokens stay CSS variables
+1. `SearchField` updates `queryInput`
+2. `useDebouncedValue` trims and waits 300ms after typing stops before filtering
+3. An order is kept when the query is empty, or when **order number** or **any product name** contains the query (case-insensitive)
+4. `StatusChips` apply as an AND filter; results are then paginated
 
-### With another day
-- Focus-trap / route announcements polish in the wizard
-- Visual regression snapshots for OrderCard + return steps
+## Mobile view
 
-### Notes for reviewers
-- Root starter files are unchanged in behavior (`mockApi.ts` contract preserved under `src/api/`)
-- Returns only for **delivered** orders
+<video src="./docs/demo-mobile.mp4" controls playsinline width="280"></video>
+
+## Desktop view
+
+<video src="./docs/demo-desktop.mp4" controls playsinline width="100%"></video>
+
+## Notes for reviewers
+
+- Mock API contract is unchanged (`src/api/mockApi.ts`)
+- Returns are only available on **delivered** orders
+- Money is handled in integer cents
