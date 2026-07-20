@@ -1,3 +1,24 @@
+# Dependencies
+node_modules
+
+# Builds
+dist
+dist-ssr
+storybook-static
+coverage
+*.tsbuildinfo
+
+# Vite / tooling caches
+.vite
+.cache
+.turbo
+.eslintcache
+.stylelintcache
+*.local
+
+# TypeScript incremental build info (project uses node_modules/.tmp)
+node_modules/.tmp
+
 # Logs
 logs
 *.log
@@ -7,19 +28,37 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-storybook-static
-*.local
+# Environment / secrets
+.env
+.env.*
+!.env.example
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# Tests
+coverage
+.nyc_output
+
+# Editor
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Optional local overrides
+*.pem
+.vercel
+.netlify
+
+# Assessment reference materials (brief + original starter copies)
+helping/
