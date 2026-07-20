@@ -1,12 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/solvpath-logo.png";
 import { Button } from "@/components/atoms/Button";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import "./AppHeader.css";
 
 export function AppHeader() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const onLoginPage = location.pathname === "/login";
+
+  const onSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="app-header">
@@ -21,13 +29,13 @@ export function AppHeader() {
               <span className="app-header__user" title={user.email}>
                 {user.name}
               </span>
-              <Button variant="ghost" size="sm" onClick={logout}>
+              <Button variant="ghost" size="sm" onClick={onSignOut}>
                 Sign out
               </Button>
             </>
-          ) : (
-            <Link to="/login" className="app-header__signin">
-              Sign in
+          ) : onLoginPage ? null : (
+            <Link to="/login" className="btn btn--secondary btn--sm app-header__signin">
+              Sign In
             </Link>
           )}
         </div>
