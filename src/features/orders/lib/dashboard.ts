@@ -1,7 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { listOrders, type Order, type OrderStatus } from "@/api/mockApi";
-import { useAbortController } from "@/hooks/useAbortController";
-import { toUserMessage, withRetry } from "@/lib/apiClient";
+import type { Order, OrderStatus } from "@/api/mockApi";
 import { orderTotalCents } from "@/lib/format";
 import { STATUS_LABELS } from "../status";
 
@@ -35,7 +32,7 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   cancelled: "#B91C1C",
 };
 
-function buildMetrics(orders: Order[]): DashboardMetrics {
+export function buildMetrics(orders: Order[]): DashboardMetrics {
   const metrics: DashboardMetrics = {
     totalOrders: orders.length,
     delivered: 0,
@@ -63,7 +60,7 @@ function buildMetrics(orders: Order[]): DashboardMetrics {
   return metrics;
 }
 
-function buildStatusSlices(orders: Order[]): StatusSlice[] {
+export function buildStatusSlices(orders: Order[]): StatusSlice[] {
   const counts: Record<OrderStatus, number> = {
     delivered: 0,
     shipped: 0,
@@ -82,11 +79,8 @@ function buildStatusSlices(orders: Order[]): StatusSlice[] {
     .filter((slice) => slice.value > 0);
 }
 
-function buildSpendSeries(orders: Order[]): SpendPoint[] {
-  const buckets = new Map<
-    string,
-    { label: string; spend: number; orders: number }
-  >();
+export function buildSpendSeries(orders: Order[]): SpendPoint[] {
+  const buckets = new Map<string, { label: string; spend: number; orders: number }>();
 
   for (const order of orders) {
     const date = new Date(`${order.placedAt}T12:00:00`);
@@ -108,53 +102,4 @@ function buildSpendSeries(orders: Order[]): SpendPoint[] {
       spend: Math.round(row.spend * 100) / 100,
       orders: row.orders,
     }));
-}
-
-export function useOrderDashboard() {
-  const { nextSignal } = useAbortController();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
-
-  useEffect(() => {
-    const signal = nextSignal();
-    let active = true;
-    setLoading(true);
-    setError(null);
-
-    withRetry(
-      () => listOrders({ page: 1, pageSize: 100, status: "all", query: "", signal }),
-      { signal, retries: 2 },
-    )
-      .then((page) => {
-        if (!active) return;
-        setOrders(page.data);
-        setLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (!active) return;
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        setError(toUserMessage(err, "We couldn't load dashboard insights."));
-        setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [nextSignal, reloadKey]);
-
-  const metrics = useMemo(() => buildMetrics(orders), [orders]);
-  const statusSlices = useMemo(() => buildStatusSlices(orders), [orders]);
-  const spendSeries = useMemo(() => buildSpendSeries(orders), [orders]);
-
-  return {
-    orders,
-    metrics,
-    statusSlices,
-    spendSeries,
-    loading,
-    error,
-    retry: () => setReloadKey((k) => k + 1),
-  };
 }

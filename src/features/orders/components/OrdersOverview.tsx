@@ -10,40 +10,46 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useState } from "react";
 import { ErrorBanner } from "@/components/molecules/ErrorBanner";
 import { formatMoney } from "@/lib/format";
-import type { OrdersStatusFilter } from "../hooks/useOrders";
-import {
-  useOrderDashboard,
-  type DashboardMetrics,
-  type SpendPoint,
-  type StatusSlice,
-} from "../hooks/useOrderDashboard";
+import type { OrdersStatusFilter } from "../lib/filterOrders";
+import type { DashboardMetrics, SpendPoint, StatusSlice } from "../lib/dashboard";
 import "./OrdersOverview.css";
 
 export interface OrdersOverviewProps {
+  metrics: DashboardMetrics;
+  statusSlices: StatusSlice[];
+  spendSeries: SpendPoint[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   onFilterStatus?: (status: OrdersStatusFilter) => void;
 }
 
-export function OrdersOverview({ onFilterStatus }: OrdersOverviewProps) {
-  const { metrics, statusSlices, spendSeries, loading, error, retry } =
-    useOrderDashboard();
-
+export function OrdersOverview({
+  metrics,
+  statusSlices,
+  spendSeries,
+  loading = false,
+  error = null,
+  onRetry,
+  onFilterStatus,
+}: OrdersOverviewProps) {
   return (
     <section className="overview" aria-label="Orders dashboard">
       <header className="overview__head">
         <div>
           <p className="overview__eyebrow">Dashboard</p>
-          <h1>Orders overview</h1>
+          <h1>Orders Overview</h1>
           <p className="overview__sub">
-            A live snapshot of your post-purchase activity — spend, status mix, and what’s
-            ready for returns.
+            See your spend, order status, and what’s ready for returns.
           </p>
         </div>
       </header>
 
       {error ? (
-        <ErrorBanner title="Dashboard unavailable" message={error} onRetry={retry} />
+        <ErrorBanner title="Dashboard Unavailable" message={error} onRetry={onRetry} />
       ) : null}
 
       <div className={`overview__metrics${loading ? " is-loading" : ""}`}>
@@ -78,8 +84,8 @@ export function OrdersOverview({ onFilterStatus }: OrdersOverviewProps) {
       <div className="overview__charts">
         <article className="overview__panel">
           <header className="overview__panel-head">
-            <h2>Spend over time</h2>
-            <p>Order totals by month</p>
+            <h2>Monthly Spend</h2>
+            <p>How much you spent on orders each month</p>
           </header>
           <div className="overview__chart">
             {spendSeries.length === 0 ? (
@@ -92,8 +98,8 @@ export function OrdersOverview({ onFilterStatus }: OrdersOverviewProps) {
 
         <article className="overview__panel">
           <header className="overview__panel-head">
-            <h2>Status mix</h2>
-            <p>Share of orders by status</p>
+            <h2>Status</h2>
+            <p>Where your orders stand right now</p>
           </header>
           <div className="overview__chart overview__chart--donut">
             {statusSlices.length === 0 ? (
@@ -143,8 +149,8 @@ function MetricCard({
 
 function SpendChart({ data }: { data: SpendPoint[] }) {
   return (
-    <ResponsiveContainer width="100%" height={220}>
-      <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
         <defs>
           <linearGradient id="spendFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#28B0C8" stopOpacity={0.35} />
@@ -157,12 +163,16 @@ function SpendChart({ data }: { data: SpendPoint[] }) {
           tick={{ fill: "#566671", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
+          height={28}
+          tickMargin={10}
+          padding={{ left: 12, right: 8 }}
         />
         <YAxis
           tick={{ fill: "#566671", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
-          width={40}
+          width={48}
+          tickMargin={8}
           tickFormatter={(v: number) => `$${v}`}
         />
         <Tooltip
@@ -194,40 +204,56 @@ function StatusChart({
   total: number;
   onSelect?: (status: OrdersStatusFilter) => void;
 }) {
+  const [active, setActive] = useState<StatusSlice | null>(null);
+
   return (
     <div className="status-chart">
-      <ResponsiveContainer width="100%" height={180}>
-        <PieChart>
-          <Pie
-            data={data}
-            dataKey="value"
-            nameKey="name"
-            innerRadius={52}
-            outerRadius={74}
-            paddingAngle={3}
-            stroke="none"
-          >
-            {data.map((slice) => (
-              <Cell
-                key={slice.key}
-                fill={slice.fill}
-                cursor={onSelect ? "pointer" : "default"}
-                onClick={() => onSelect?.(slice.key)}
-              />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{
-              borderRadius: 10,
-              border: "1px solid #E2E8EB",
-            }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-      <div className="status-chart__center" aria-hidden>
-        <strong>{total}</strong>
-        <span>orders</span>
+      <div className="status-chart__plot">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={52}
+              outerRadius={74}
+              paddingAngle={3}
+              stroke="none"
+              onMouseLeave={() => setActive(null)}
+            >
+              {data.map((slice) => (
+                <Cell
+                  key={slice.key}
+                  fill={slice.fill}
+                  cursor={onSelect ? "pointer" : "default"}
+                  onClick={() => onSelect?.(slice.key)}
+                  onMouseEnter={() => setActive(slice)}
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="status-chart__center" aria-hidden>
+          <div className="status-chart__center-inner">
+            <strong>{total}</strong>
+            <span>orders</span>
+          </div>
+        </div>
       </div>
+
+      <div className="status-chart__hover" aria-live="polite">
+        {active ? (
+          <>
+            <span className="status-chart__hover-dot" style={{ background: active.fill }} />
+            <span>
+              {active.name}: <strong>{active.value}</strong>
+            </span>
+          </>
+        ) : (
+          <span className="status-chart__hover-hint">Hover a segment for details</span>
+        )}
+      </div>
+
       <ul className="status-chart__legend">
         {data.map((slice) => (
           <li key={slice.key}>
@@ -235,6 +261,8 @@ function StatusChart({
               type="button"
               className="status-chart__legend-btn"
               onClick={() => onSelect?.(slice.key)}
+              onMouseEnter={() => setActive(slice)}
+              onMouseLeave={() => setActive(null)}
             >
               <span style={{ background: slice.fill }} />
               {slice.name}
@@ -254,13 +282,13 @@ function ThroughputStrip({ metrics }: { metrics: DashboardMetrics }) {
     { label: "Delivered", value: metrics.delivered, color: "var(--success)" },
     { label: "Cancelled", value: metrics.cancelled, color: "var(--danger)" },
   ];
-  const max = Math.max(1, ...rows.map((r) => r.value));
+  const total = Math.max(1, metrics.totalOrders);
 
   return (
     <article className="overview__panel overview__throughput">
       <header className="overview__panel-head">
-        <h2>Throughput</h2>
-        <p>Relative volume by status — Horizon-style workload view</p>
+        <h2>Order Volume</h2>
+        <p>Share of all {metrics.totalOrders} orders by status</p>
       </header>
       <ul className="throughput">
         {rows.map((row) => (
@@ -269,10 +297,18 @@ function ThroughputStrip({ metrics }: { metrics: DashboardMetrics }) {
               <span>{row.label}</span>
               <strong>{row.value}</strong>
             </div>
-            <div className="throughput__track">
+            <div
+              className="throughput__track"
+              role="meter"
+              aria-label={`${row.label}: ${row.value} of ${metrics.totalOrders}`}
+              aria-valuenow={row.value}
+              aria-valuemin={0}
+              aria-valuemax={metrics.totalOrders}
+            >
               <span
                 style={{
-                  width: `${(row.value / max) * 100}%`,
+                  width: row.value === 0 ? "0%" : `${(row.value / total) * 100}%`,
+                  minWidth: row.value > 0 ? 4 : 0,
                   background: row.color,
                 }}
               />
