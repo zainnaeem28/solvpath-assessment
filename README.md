@@ -31,8 +31,8 @@ No password — pick a demo email on `/login`.
 
 ## What's included
 
-1. **Auth / accounts** — mock sign-in, persisted session (Zustand), protected routes, header account + sign out.
-2. **Orders dashboard** — paginated list (page size 4), status filter, search, loading / empty / error + retry.
+1. **Auth / accounts** — mock sign-in, persisted session (Zustand), protected routes, header/sidebar account + sign out.
+2. **Orders dashboard** — sidebar shell + KPI widgets + welcome panel, then paginated order activity (table on desktop / cards on mobile), status filter, search, loading / empty / error + retry.
 3. **Return / exchange flow** — items → reason → resolution → review → submit.
 4. **Draft persistence** — in-progress returns survive refresh (localStorage via Zustand).
 5. **Exchange inventory** — size + color selection with out-of-stock combinations disabled.
@@ -71,11 +71,12 @@ src/
 - Vitest for the fiddly correctness bits; Storybook for the shared UI kit
 
 ### Trade-offs
+- **Dashboard chrome inspired by common e-commerce dashboard patterns** (sidebar + KPI strip + activity table) while staying customer-facing and on the required solvpath palette — the brief provides no Figma; layout craft is ours, brand tokens are not.
 - **Mock auth** (email-only demo accounts) instead of OAuth — no real backend in the kit
 - **Exchange prefs encoded into the return `reason` string** when submitting — the mock `ReturnRequest` type has no dedicated field for size/color; called out here rather than silently dropping data
 - **CSS co-located with components** (not Tailwind) so brand tokens stay CSS variables as provided
 - **Feature folders + atomic shared UI** — domain logic stays under `features/`; atoms/molecules stay presentational
-- **Storybook peer deps** — install with `npm install --legacy-peer-deps` because Storybook 9’s peer range lags Vite 8
+- **Storybook peer deps** — install with `npm install --legacy-peer-deps` because Storybook 9’s peer range lags Vite 8 (`.npmrc` sets this automatically)
 - Left `apiConfig` failure rates at starter values so failure/retry UX is reviewable
 
 ### Notes for reviewers
