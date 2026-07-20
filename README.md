@@ -32,7 +32,7 @@ No password — pick a demo email on `/login`.
 ## What's included
 
 1. **Auth / accounts** — mock sign-in, persisted session (Zustand), protected routes, header/sidebar account + sign out.
-2. **Orders dashboard** — sidebar shell + KPI widgets + welcome panel, then paginated order activity (table on desktop / cards on mobile), status filter, search, loading / empty / error + retry.
+2. **Orders dashboard** — Figma-aligned layout (icon sidebar, greeting + search, KPI cards, order stats table, right analytics rail) using solvpath brand tokens; search/filter/pagination still required by the brief.
 3. **Return / exchange flow** — items → reason → resolution → review → submit.
 4. **Draft persistence** — in-progress returns survive refresh (localStorage via Zustand).
 5. **Exchange inventory** — size + color selection with out-of-stock combinations disabled.

@@ -11,59 +11,58 @@ export interface OrdersTableProps {
 
 export function OrdersTable({ orders }: OrdersTableProps) {
   return (
-    <div className="orders-table" role="region" aria-label="Orders table">
+    <div className="orders-table" role="region" aria-label="Order stats">
       <table>
         <thead>
           <tr>
-            <th scope="col">Order</th>
-            <th scope="col">Placed</th>
-            <th scope="col">Items</th>
-            <th scope="col">Status</th>
+            <th scope="col">Product</th>
             <th scope="col">Total</th>
-            <th scope="col">
-              <span className="sr-only">Actions</span>
-            </th>
+            <th scope="col">Status</th>
+            <th scope="col">Date</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
           {orders.map((order) => {
+            const lead = order.items[0];
+            const qty = order.items.reduce((sum, item) => sum + item.quantity, 0);
             const total = orderTotalCents(order.items);
             const canReturn = order.status === "delivered";
+
             return (
               <tr key={order.id}>
                 <td>
-                  <strong className="orders-table__number">{order.orderNumber}</strong>
+                  <div className="orders-table__product">
+                    <span
+                      className="orders-table__thumb"
+                      style={{ background: lead?.thumbColor ?? "var(--brand-soft)" }}
+                      aria-hidden
+                    />
+                    <div>
+                      <strong>{lead?.name ?? order.orderNumber}</strong>
+                      <small>
+                        {order.orderNumber}
+                        {order.items.length > 1 ? ` · +${order.items.length - 1} more` : ""}
+                      </small>
+                    </div>
+                  </div>
                 </td>
-                <td>{formatDate(order.placedAt)}</td>
                 <td>
-                  <ul className="orders-table__items">
-                    {order.items.map((item) => (
-                      <li key={item.id}>
-                        <span
-                          className="orders-table__thumb"
-                          style={{ background: item.thumbColor ?? "var(--brand-soft)" }}
-                          aria-hidden
-                        />
-                        <span>
-                          {item.name}
-                          <small>
-                            ×{item.quantity} · {formatMoney(item.unitPriceCents)}
-                          </small>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="orders-table__total-cell">
+                    <span>{qty}x</span>
+                    <small>{formatMoney(total)}</small>
+                  </div>
                 </td>
                 <td>
                   <Badge tone={STATUS_TONES[order.status]}>
                     {STATUS_LABELS[order.status]}
                   </Badge>
                 </td>
-                <td className="orders-table__total">{formatMoney(total)}</td>
-                <td className="orders-table__action">
+                <td>{formatDate(order.placedAt)}</td>
+                <td>
                   {canReturn ? (
                     <Link to={`/orders/${order.id}/return`} className="orders-table__cta">
-                      Return / exchange
+                      Return
                     </Link>
                   ) : (
                     <span className="orders-table__muted">—</span>

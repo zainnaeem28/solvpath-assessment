@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ApiError,
   listOrders,
@@ -53,7 +53,7 @@ function computeStats(orders: Order[]): OrderStats {
 
 export function useOrderStats() {
   const { nextSignal } = useAbortController();
-  const [stats, setStats] = useState<OrderStats>(EMPTY);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -64,11 +64,10 @@ export function useOrderStats() {
     setLoading(true);
     setError(null);
 
-    // Pull a wide page once so KPI widgets reflect the full account, not just page 1.
     listOrders({ page: 1, pageSize: 100, status: "all", query: "", signal })
       .then((page) => {
         if (!active) return;
-        setStats(computeStats(page.data));
+        setOrders(page.data);
         setLoading(false);
       })
       .catch((err: unknown) => {
@@ -87,8 +86,11 @@ export function useOrderStats() {
     };
   }, [nextSignal, reloadKey]);
 
+  const stats = useMemo(() => (orders.length ? computeStats(orders) : EMPTY), [orders]);
+
   return {
     stats,
+    orders,
     loading,
     error,
     retry: () => setReloadKey((k) => k + 1),

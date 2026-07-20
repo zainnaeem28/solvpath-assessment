@@ -25,8 +25,8 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="app-shell app-shell--dashboard">
-      <DashboardSidebar />
-      <div className="app-shell__content">
+      <div className="app-shell__frame">
+        <DashboardSidebar />
         <main className="app-shell__main app-shell__main--dashboard">{children}</main>
       </div>
     </div>
