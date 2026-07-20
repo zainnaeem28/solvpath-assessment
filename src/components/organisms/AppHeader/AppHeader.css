@@ -4,7 +4,7 @@
   z-index: 20;
   height: var(--header-height);
   border-bottom: 1px solid var(--line);
-  background: rgb(255 255 255 / 88%);
+  background: rgb(255 255 255 / 92%);
   backdrop-filter: blur(10px);
 }
 
@@ -26,48 +26,39 @@
 }
 
 .app-header__logo {
-  height: 1.75rem;
+  height: 1.55rem;
   width: auto;
 }
 
-.app-header__aside {
+.app-header__actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
+  gap: 0.5rem;
 }
 
-.app-header__tagline {
-  font-size: 0.8125rem;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.app-header__account {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 0;
-}
-
-.app-header__account-name {
+.app-header__user {
   font-size: 0.875rem;
-  font-weight: 650;
-  line-height: 1.2;
-}
-
-.app-header__account-email {
-  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--muted);
-  max-width: 14rem;
+  max-width: 10rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-@media (max-width: 560px) {
-  .app-header__account-email,
-  .app-header__tagline {
+.app-header__signin {
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--accent-deep);
+  text-decoration: none;
+}
+
+.app-header__signin:hover {
+  color: var(--brand);
+}
+
+@media (max-width: 480px) {
+  .app-header__user {
     display: none;
   }
 }

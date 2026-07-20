@@ -1,85 +1,72 @@
 # solvpath — Senior Front-End take-home
 
-Customer-facing post-purchase slice: sign in, browse orders, and complete a guided return / exchange — including draft persistence, exchange inventory selection, offline submit queue, tests, and Storybook.
+Customer-facing post-purchase app: browse orders, then complete a guided return / exchange.
 
 **Stack:** React 19 · TypeScript · Vite · React Router · Zustand · Vitest · Storybook · CSS (brand tokens)
 
 ## Install → run
 
 ```bash
-npm install --legacy-peer-deps
+npm install
 npm run dev
 ```
 
 Open the URL Vite prints (usually `http://localhost:5173`).
 
 ```bash
-npm run build           # production build
-npm run preview         # serve the build
-npm test                # Vitest unit tests
-npm run storybook       # component explorer on :6006
+npm run build
+npm run preview
+npm test
+npm run storybook
 ```
 
-### Demo accounts
-
-| Name | Email |
-|------|--------|
-| Maya Chen | `maya.chen@example.com` |
-| Jordan Lee | `jordan.lee@example.com` |
-
-No password — pick a demo email on `/login`.
+Optional demo sign-in lives at `/login` (`maya.chen@example.com` / `jordan.lee@example.com`) — not required to use orders or returns.
 
 ## What's included
 
-1. **Auth / accounts** — mock sign-in, persisted session (Zustand), protected routes, header/sidebar account + sign out.
-2. **Orders dashboard** — Figma-aligned layout (icon sidebar, greeting + search, KPI cards, order stats table, right analytics rail) using solvpath brand tokens; search/filter/pagination still required by the brief.
-3. **Return / exchange flow** — items → reason → resolution → review → submit.
-4. **Draft persistence** — in-progress returns survive refresh (localStorage via Zustand).
-5. **Exchange inventory** — size + color selection with out-of-stock combinations disabled.
-6. **Money math** — integer cents; store credit applies **+10%** (`Math.round(subtotal * 1.1)`).
-7. **Offline / flaky submit** — queues returns locally and flushes on `online` / next visit; optimistic messaging while submitting.
-8. **A11y** — step live region + focus move to the step heading on change.
-9. **Tests** — Vitest coverage for money helpers, step validation, and auth lookup.
-10. **Storybook** — atoms/molecules (Button, Badge, SearchField, ErrorBanner, Pagination).
+1. **Orders dashboard** — searchable, status-filtered, paginated order list with loading skeletons, empty state, and retryable errors.
+2. **Return / exchange flow** — items → reason → resolution (incl. exchange size/color) → review → submit.
+3. **Draft persistence** — in-progress returns survive refresh.
+4. **Resilient API client** — automatic retries for transient mock failures (without changing `mockApi` behavior).
+5. **Money math** — integer cents; store credit **+10%** (`Math.round(subtotal * 1.1)`).
+6. **Vitest** + **Storybook** for shared UI pieces.
 
 ## Architecture
 
-Hybrid: **feature modules first**, light **atomic UI** for shared presentational pieces.
+Feature modules first; light atomic UI for shared presentational components.
 
 ```text
 src/
-├── api/mockApi.ts                 # starter mock backend (behavior unchanged)
+├── api/mockApi.ts
 ├── components/{atoms,molecules,organisms,templates}
-├── features/
-│   ├── auth/                      # accounts, login, RequireAuth, Zustand session
-│   ├── orders/                    # dashboard + data hooks
-│   └── returns/                   # wizard, money, validation, drafts, offline queue
+├── features/{auth,orders,returns}
 ├── pages/
-├── hooks/
 └── styles/
 ```
 
 ## Decision log
 
 ### Chose to build
-- Full brief requirements end-to-end against `listOrders` / `getOrder` / `submitReturn`
-- Auth gate so the app feels like a real post-purchase account surface
-- Zustand for session + return drafts (small global state with persistence)
-- Exchange size/color inventory as part of the resolution step
-- Abortable fetches, retries, offline queue flush on reconnect
-- Deferred search (`useDeferredValue`), wizard focus + `aria-live`
-- Vitest for the fiddly correctness bits; Storybook for the shared UI kit
+- Brief-first UX: calm customer account surface (Shop / Amazon returns inspired), not an admin analytics dashboard
+- Auto-retry (2 attempts) around `listOrders` / `getOrder` / `submitReturn` so intermittent mock failures feel recoverable
+- Status chips + deferred search + skeletons for perceived performance
+- Step validation, store-credit bonus math, exchange inventory selection
+- Offline return queue when `navigator.onLine` is false
+
+### Deliberately skipped
+- Forced authentication (brief says it isn’t required)
+- Pixel-matching an external Figma admin dashboard — wrong product surface for this brief
+- Exhaustive E2E suite
 
 ### Trade-offs
-- **Dashboard chrome inspired by common e-commerce dashboard patterns** (sidebar + KPI strip + activity table) while staying customer-facing and on the required solvpath palette — the brief provides no Figma; layout craft is ours, brand tokens are not.
-- **Mock auth** (email-only demo accounts) instead of OAuth — no real backend in the kit
-- **Exchange prefs encoded into the return `reason` string** when submitting — the mock `ReturnRequest` type has no dedicated field for size/color; called out here rather than silently dropping data
-- **CSS co-located with components** (not Tailwind) so brand tokens stay CSS variables as provided
-- **Feature folders + atomic shared UI** — domain logic stays under `features/`; atoms/molecules stay presentational
-- **Storybook peer deps** — install with `npm install --legacy-peer-deps` because Storybook 9’s peer range lags Vite 8 (`.npmrc` sets this automatically)
-- Left `apiConfig` failure rates at starter values so failure/retry UX is reviewable
+- Mock API failure rates left at starter values; resilience is client-side retry, not muted randomness
+- Exchange preferences appended into `reason` because `ReturnRequest` has no dedicated field
+- CSS co-located with components so brand tokens stay CSS variables
+
+### With another day
+- Focus-trap / route announcements polish in the wizard
+- Visual regression snapshots for OrderCard + return steps
 
 ### Notes for reviewers
-- Starter assets remain at the repo root (`mockApi.ts`, `brand-tokens.css`, `solvpath-logo.png`, `CANDIDATE_BRIEF.pdf`). The app imports copies under `src/` — **mock API behavior was not changed**.
-- Returns are only offered for **delivered** orders.
-- Refresh mid-return to verify draft restore; toggle DevTools offline to exercise the queue.
+- Root starter files are unchanged in behavior (`mockApi.ts` contract preserved under `src/api/`)
+- Returns only for **delivered** orders

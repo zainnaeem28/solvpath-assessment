@@ -12,13 +12,17 @@ export interface OrderCardProps {
 export function OrderCard({ order }: OrderCardProps) {
   const total = orderTotalCents(order.items);
   const canReturn = order.status === "delivered";
+  const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <article className="order-card">
       <header className="order-card__header">
         <div>
           <p className="order-card__number">{order.orderNumber}</p>
-          <p className="order-card__meta">Placed {formatDate(order.placedAt)}</p>
+          <p className="order-card__meta">
+            Placed {formatDate(order.placedAt)} · {itemCount} item
+            {itemCount === 1 ? "" : "s"}
+          </p>
         </div>
         <Badge tone={STATUS_TONES[order.status]}>{STATUS_LABELS[order.status]}</Badge>
       </header>
@@ -53,8 +57,8 @@ export function OrderCard({ order }: OrderCardProps) {
         ) : (
           <p className="order-card__hint">
             {order.status === "cancelled"
-              ? "Cancelled orders aren't eligible for return."
-              : "Returns open once the order is delivered."}
+              ? "Not eligible for return"
+              : "Returns available after delivery"}
           </p>
         )}
       </footer>

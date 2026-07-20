@@ -1,40 +1,30 @@
-/* solvpath brand tokens — drop in and reference these variables, or map into your theme. */
+/* solvpath brand tokens */
 :root {
-  /* Primary (deep navy) — primary buttons & chrome; use white text on it */
   --brand: #0e2c3e;
   --brand-hover: #17394e;
   --brand-soft: #e7f0f3;
-
-  /* Accent (teal) — active states, focus, selection, highlights */
   --accent: #28b0c8;
-  --accent-deep: #0c6e80; /* use for teal text / links (contrast-safe on white) */
+  --accent-deep: #0c6e80;
   --accent-soft: #e4f5f8;
-
-  /* Neutrals */
-  --ink: #0b2430; /* body text        */
-  --muted: #566671; /* secondary text   */
-  --line: #e2e8eb; /* borders/dividers */
-  --canvas: #f4f7f9; /* page background  */
-  --surface: #ffffff; /* cards            */
-
-  /* Status (text + soft background) */
+  --ink: #0b2430;
+  --muted: #566671;
+  --line: #e2e8eb;
+  --canvas: #f4f7f9;
+  --surface: #ffffff;
   --success: #127a3b;
-  --success-soft: #e7f7ed; /* delivered   */
+  --success-soft: #e7f7ed;
   --info: #1d4ed8;
-  --info-soft: #e7eeff; /* in transit  */
+  --info-soft: #e7eeff;
   --warning: #b45309;
-  --warning-soft: #fbf0de; /* processing  */
+  --warning-soft: #fbf0de;
   --danger: #b91c1c;
-  --danger-soft: #fcebeb; /* cancelled   */
-
-  --radius-card: 16px;
+  --danger-soft: #fcebeb;
+  --radius-card: 14px;
   --radius-control: 10px;
-  --shadow-soft: 0 1px 2px rgb(11 36 48 / 4%), 0 8px 24px rgb(11 36 48 / 6%);
+  --shadow-soft: 0 1px 2px rgb(11 36 48 / 5%), 0 10px 28px rgb(11 36 48 / 5%);
   --font-sans: "Inter", system-ui, sans-serif;
-  --max-width: 960px;
-  --max-width-dashboard: 1120px;
+  --max-width: 720px;
   --header-height: 64px;
-  --sidebar-width: 15.5rem;
 }
 
 *,
@@ -52,10 +42,7 @@ body {
   min-height: 100vh;
   font-family: var(--font-sans);
   color: var(--ink);
-  background:
-    radial-gradient(ellipse 80% 50% at 100% -20%, rgb(40 176 200 / 12%), transparent),
-    radial-gradient(ellipse 60% 40% at 0% 0%, rgb(14 44 62 / 6%), transparent),
-    var(--canvas);
+  background: var(--canvas);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -127,4 +114,25 @@ p {
 
 .page-status--start {
   align-items: stretch;
+}
+
+.skeleton {
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    var(--brand-soft) 0%,
+    #eef3f5 45%,
+    var(--brand-soft) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }

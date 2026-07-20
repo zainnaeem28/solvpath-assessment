@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  ApiError,
   listOrders,
   type ListParams,
   type Order,
@@ -8,6 +7,7 @@ import {
   type Page,
 } from "@/api/mockApi";
 import { useAbortController } from "@/hooks/useAbortController";
+import { toUserMessage, withRetry } from "@/lib/apiClient";
 import { PAGE_SIZE } from "../status";
 
 export type OrdersStatusFilter = OrderStatus | "all";
@@ -50,7 +50,7 @@ export function useOrders({ page, status, query }: UseOrdersParams) {
       signal,
     };
 
-    listOrders(params)
+    withRetry(() => listOrders(params), { signal, retries: 2 })
       .then((data) => {
         if (!active) return;
         setState({ status: "success", data, error: null });
@@ -58,14 +58,13 @@ export function useOrders({ page, status, query }: UseOrdersParams) {
       .catch((err: unknown) => {
         if (!active) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
-        const message =
-          err instanceof ApiError
-            ? err.message
-            : "We couldn't load your orders. Please try again.";
         setState((prev) => ({
           status: "error",
           data: prev.data,
-          error: message,
+          error: toUserMessage(
+            err,
+            "We couldn't load your orders. Please try again.",
+          ),
         }));
       });
 

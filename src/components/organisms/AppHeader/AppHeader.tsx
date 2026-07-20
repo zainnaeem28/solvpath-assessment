@@ -11,22 +11,24 @@ export function AppHeader() {
   return (
     <header className="app-header">
       <div className="app-header__inner">
-        <Link to={user ? "/" : "/login"} className="app-header__brand" aria-label="solvpath home">
-          <img src={logo} alt="solvpath" className="app-header__logo" width={140} height={32} />
+        <Link to="/" className="app-header__brand" aria-label="solvpath home">
+          <img src={logo} alt="solvpath" className="app-header__logo" width={128} height={28} />
         </Link>
-        <div className="app-header__aside">
+
+        <div className="app-header__actions">
           {user ? (
             <>
-              <div className="app-header__account">
-                <span className="app-header__account-name">{user.name}</span>
-                <span className="app-header__account-email">{user.email}</span>
-              </div>
-              <Button variant="secondary" size="sm" onClick={logout}>
+              <span className="app-header__user" title={user.email}>
+                {user.name}
+              </span>
+              <Button variant="ghost" size="sm" onClick={logout}>
                 Sign out
               </Button>
             </>
           ) : (
-            <p className="app-header__tagline">Post-purchase self-service</p>
+            <Link to="/login" className="app-header__signin">
+              Sign in
+            </Link>
           )}
         </div>
       </div>

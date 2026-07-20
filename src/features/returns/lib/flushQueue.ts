@@ -1,9 +1,10 @@
 import { ApiError, submitReturn } from "@/api/mockApi";
+import { withRetry } from "@/lib/apiClient";
 import { readReturnQueue, writeReturnQueue, type QueuedReturn } from "./offlineQueue";
 
 let flushing = false;
 
-/** Attempt to submit any queued returns (offline / failed submits). */
+/** Attempt to submit any queued returns (offline submits). */
 export async function flushReturnQueue(): Promise<{
   sent: string[];
   remaining: QueuedReturn[];
@@ -22,7 +23,7 @@ export async function flushReturnQueue(): Promise<{
 
     for (const entry of queue) {
       try {
-        await submitReturn(entry.request);
+        await withRetry(() => submitReturn(entry.request), { retries: 2 });
         sent.push(entry.id);
       } catch (err) {
         const dropClientError =

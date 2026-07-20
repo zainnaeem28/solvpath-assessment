@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ApiError,
   submitReturn,
   type Order,
   type OrderItem,
   type ReturnReceipt,
   type ReturnResolution,
 } from "@/api/mockApi";
+import { toUserMessage, withRetry } from "@/lib/apiClient";
 import {
   RETURN_REASONS,
   calculateResolutionAmountCents,
@@ -252,32 +252,21 @@ export function useReturnFlow(order: Order | null) {
       return;
     }
 
-    // Optimistic receipt id while the network call is in flight
-    const optimisticId = `pending_${Date.now().toString(36)}`;
+    // Optimistic notice while the network call is in flight
     setSubmitNotice("Submitting your return…");
 
     try {
-      const result = await submitReturn(request);
+      const result = await withRetry(() => submitReturn(request), { retries: 2 });
       clearDraft(order.id);
       setReceipt(result);
       setSubmitNotice(null);
       void flushReturnQueue();
     } catch (err: unknown) {
-      const message =
-        err instanceof ApiError
-          ? err.message
-          : "We couldn't submit your return. Please try again.";
-
-      // Queue for retry so the shopper doesn't lose work on flaky networks
-      enqueueReturn({
-        id: optimisticId,
-        createdAt: new Date().toISOString(),
-        request,
-        exchangeSelections,
-      });
-      setSubmitError(
-        `${message} We've also saved this return locally and will retry automatically when possible.`,
+      const message = toUserMessage(
+        err,
+        "We couldn't submit your return. Please try again.",
       );
+      setSubmitError(message);
       setSubmitNotice(null);
     } finally {
       setSubmitting(false);
