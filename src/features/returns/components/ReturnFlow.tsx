@@ -67,7 +67,7 @@ export function ReturnFlow({ order }: ReturnFlowProps) {
         <Link to="/" className="return-flow__back-link">
           ← Back to orders
         </Link>
-        <h1 className="return-flow__title">Return or exchange</h1>
+        <h1 className="return-flow__title">Return or Exchange</h1>
         <p className="return-flow__subtitle">
           Order {order.orderNumber} · placed {formatDate(order.placedAt)}
         </p>
@@ -90,7 +90,7 @@ export function ReturnFlow({ order }: ReturnFlowProps) {
             {flow.step === "items" && "Which items are you sending back?"}
             {flow.step === "reason" && "Why are you returning these?"}
             {flow.step === "resolution" && "How should we make this right?"}
-            {flow.step === "review" && "Review and submit"}
+            {flow.step === "review" && "Review and Submit"}
           </h2>
 
           {flow.step === "items" ? (
@@ -189,9 +189,7 @@ export function ReturnFlow({ order }: ReturnFlowProps) {
                 </div>
                 <div>
                   <dt>Resolution</dt>
-                  <dd>
-                    {flow.resolution ? RESOLUTION_COPY[flow.resolution].title : "—"}
-                  </dd>
+                  <dd>{flow.resolution ? RESOLUTION_COPY[flow.resolution].title : "—"}</dd>
                 </div>
                 {flow.resolution === "exchange" ? (
                   <div>

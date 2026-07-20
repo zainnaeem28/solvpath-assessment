@@ -1,6 +1,7 @@
 import type { OrderItem } from "@/api/mockApi";
 import { Button } from "@/components/atoms/Button";
 import { formatMoney } from "@/lib/format";
+import { initialsFromName } from "@/lib/initials";
 import "./ReturnItemPicker.css";
 
 export interface ReturnItemPickerProps {
@@ -35,7 +36,9 @@ export function ReturnItemPicker({
                 className="return-items__thumb"
                 style={{ background: item.thumbColor ?? "var(--brand-soft)" }}
                 aria-hidden
-              />
+              >
+                <span className="return-items__thumb-mark">{initialsFromName(item.name)}</span>
+              </span>
               <div className="return-items__copy">
                 <p className="return-items__name">{item.name}</p>
                 <p className="return-items__meta">

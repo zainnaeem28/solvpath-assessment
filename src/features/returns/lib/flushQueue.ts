@@ -27,10 +27,7 @@ export async function flushReturnQueue(): Promise<{
         sent.push(entry.id);
       } catch (err) {
         const dropClientError =
-          err instanceof ApiError &&
-          err.status >= 400 &&
-          err.status < 500 &&
-          err.status !== 408;
+          err instanceof ApiError && err.status >= 400 && err.status < 500 && err.status !== 408;
         if (!dropClientError) {
           remaining.push(entry);
         }

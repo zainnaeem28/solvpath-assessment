@@ -11,17 +11,11 @@ export interface ExchangePickerProps {
   error?: string;
 }
 
-export function ExchangePicker({
-  items,
-  selections,
-  onChange,
-  error,
-}: ExchangePickerProps) {
+export function ExchangePicker({ items, selections, onChange, error }: ExchangePickerProps) {
   return (
     <div className="exchange-picker">
       <p className="exchange-picker__help">
-        Pick the replacement size and color for each item. Out-of-stock combinations are
-        disabled.
+        Pick the replacement size and color for each item. Out-of-stock combinations are disabled.
       </p>
       <ul className="exchange-picker__list">
         {items.map((item) => {
@@ -53,8 +47,7 @@ export function ExchangePicker({
                   options={[
                     { value: "", label: "Select color" },
                     ...inventory.colors.map((color) => {
-                      const available =
-                        !selection.size || inventory.inStock(selection.size, color);
+                      const available = !selection.size || inventory.inStock(selection.size, color);
                       return {
                         value: color,
                         label: available ? color : `${color} (out of stock)`,

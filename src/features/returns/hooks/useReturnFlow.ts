@@ -15,10 +15,7 @@ import {
 } from "../lib/money";
 import { RETURN_STEPS, type ReturnStep } from "../lib/steps";
 import { validateReturnStep } from "../lib/validation";
-import {
-  enqueueReturn,
-  type ExchangeSelection,
-} from "../lib/offlineQueue";
+import { enqueueReturn, type ExchangeSelection } from "../lib/offlineQueue";
 import { useReturnDraftStore } from "../store/returnDraftStore";
 import { flushReturnQueue } from "../lib/flushQueue";
 
@@ -26,9 +23,7 @@ export type { ReturnStep };
 export { RETURN_STEPS };
 
 function initialQuantities(items: OrderItem[]): Record<string, number> {
-  return Object.fromEntries(
-    items.filter((i) => i.returnEligible).map((i) => [i.id, 0]),
-  );
+  return Object.fromEntries(items.filter((i) => i.returnEligible).map((i) => [i.id, 0]));
 }
 
 export function useReturnFlow(order: Order | null) {
@@ -41,9 +36,9 @@ export function useReturnFlow(order: Order | null) {
   const [reason, setReason] = useState<ReturnReason | "">("");
   const [comment, setComment] = useState("");
   const [resolution, setResolution] = useState<ReturnResolution | null>(null);
-  const [exchangeSelections, setExchangeSelections] = useState<
-    Record<string, ExchangeSelection>
-  >({});
+  const [exchangeSelections, setExchangeSelections] = useState<Record<string, ExchangeSelection>>(
+    {},
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -103,10 +98,7 @@ export function useReturnFlow(order: Order | null) {
   );
 
   const resolutionAmountCents = useMemo(
-    () =>
-      resolution
-        ? calculateResolutionAmountCents(subtotalCents, resolution)
-        : subtotalCents,
+    () => (resolution ? calculateResolutionAmountCents(subtotalCents, resolution) : subtotalCents),
     [resolution, subtotalCents],
   );
 
@@ -150,10 +142,7 @@ export function useReturnFlow(order: Order | null) {
     }
   };
 
-  const setExchangeSelection = (
-    itemId: string,
-    patch: Partial<ExchangeSelection>,
-  ) => {
+  const setExchangeSelection = (itemId: string, patch: Partial<ExchangeSelection>) => {
     setExchangeSelections((prev) => ({
       ...prev,
       [itemId]: {
@@ -209,14 +198,7 @@ export function useReturnFlow(order: Order | null) {
       resolution,
       comment: comment.trim() || undefined,
     };
-  }, [
-    order,
-    resolution,
-    reason,
-    selectedItems,
-    exchangeSelections,
-    comment,
-  ]);
+  }, [order, resolution, reason, selectedItems, exchangeSelections, comment]);
 
   const submit = async () => {
     if (!order || !resolution || !reason) return;
@@ -262,10 +244,7 @@ export function useReturnFlow(order: Order | null) {
       setSubmitNotice(null);
       void flushReturnQueue();
     } catch (err: unknown) {
-      const message = toUserMessage(
-        err,
-        "We couldn't submit your return. Please try again.",
-      );
+      const message = toUserMessage(err, "We couldn't submit your return. Please try again.");
       setSubmitError(message);
       setSubmitNotice(null);
     } finally {

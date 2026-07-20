@@ -1,10 +1,20 @@
+.return-success-page {
+  min-height: calc(100vh - var(--header-height) - 4.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0 1.5rem;
+}
+
 .return-success {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.85rem;
-  max-width: 36rem;
-  padding: 1.75rem;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 24rem;
+  padding: 2rem 1.5rem 1.75rem;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -24,57 +34,32 @@
 }
 
 .return-success__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 0.15rem;
   border-radius: 50%;
   background: var(--success-soft);
   color: var(--success);
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
 }
 
 .return-success h1 {
-  font-size: 1.75rem;
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
 }
 
 .return-success__copy {
-  color: var(--muted);
-}
-
-.return-success__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 0.35rem 0 0.5rem;
-  width: 100%;
-}
-
-.return-success__meta div {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.return-success__meta dt {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.return-success__meta dd {
   margin: 0;
-}
-
-.return-success__meta code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  max-width: 28ch;
+  color: var(--muted);
   font-size: 0.95rem;
-  background: var(--brand-soft);
-  padding: 0.15rem 0.4rem;
-  border-radius: 6px;
+  line-height: 1.45;
 }
 
 .return-success__cta {
@@ -82,7 +67,8 @@
   align-items: center;
   justify-content: center;
   min-height: 2.5rem;
-  padding: 0.55rem 1rem;
+  margin-top: 0.65rem;
+  padding: 0.55rem 1.25rem;
   border-radius: var(--radius-control);
   background: var(--brand);
   color: #fff;
@@ -97,9 +83,22 @@
 
 .return-success__notice {
   width: 100%;
-  padding: 0.75rem 0.9rem;
+  margin: 0.15rem 0 0;
+  padding: 0.7rem 0.85rem;
   border-radius: var(--radius-control);
   background: var(--accent-soft);
   color: var(--accent-deep);
   font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .return-success-page {
+    min-height: calc(100vh - var(--header-height) - 6rem);
+  }
+
+  .return-success {
+    padding: 2.25rem 1.75rem 2rem;
+  }
 }

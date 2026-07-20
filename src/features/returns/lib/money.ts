@@ -41,10 +41,7 @@ export const RETURN_REASONS = [
 
 export type ReturnReason = (typeof RETURN_REASONS)[number];
 
-export const RESOLUTION_COPY: Record<
-  ReturnResolution,
-  { title: string; description: string }
-> = {
+export const RESOLUTION_COPY: Record<ReturnResolution, { title: string; description: string }> = {
   refund: {
     title: "Refund to original payment",
     description: "We'll refund the returned item value to your original payment method.",

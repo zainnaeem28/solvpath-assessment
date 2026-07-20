@@ -1,9 +1,6 @@
 import type { ReturnResolution } from "@/api/mockApi";
 import { formatMoney } from "@/lib/format";
-import {
-  RESOLUTION_COPY,
-  calculateStoreCreditCents,
-} from "../lib/money";
+import { RESOLUTION_COPY, calculateStoreCreditCents } from "../lib/money";
 import "./ResolutionPicker.css";
 
 export interface ResolutionPickerProps {
@@ -15,12 +12,7 @@ export interface ResolutionPickerProps {
 
 const OPTIONS: ReturnResolution[] = ["refund", "exchange", "store_credit"];
 
-export function ResolutionPicker({
-  value,
-  onChange,
-  subtotalCents,
-  error,
-}: ResolutionPickerProps) {
+export function ResolutionPicker({ value, onChange, subtotalCents, error }: ResolutionPickerProps) {
   return (
     <fieldset className="resolution">
       <legend className="sr-only">Choose a resolution</legend>
@@ -29,9 +21,7 @@ export function ResolutionPicker({
           const copy = RESOLUTION_COPY[option];
           const selected = value === option;
           const amount =
-            option === "store_credit"
-              ? calculateStoreCreditCents(subtotalCents)
-              : subtotalCents;
+            option === "store_credit" ? calculateStoreCreditCents(subtotalCents) : subtotalCents;
 
           return (
             <label
