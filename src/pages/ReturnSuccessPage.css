@@ -94,3 +94,12 @@
   background: var(--brand-hover);
   color: #fff;
 }
+
+.return-success__notice {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-control);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 0.875rem;
+}

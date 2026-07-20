@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ApiError,
   submitReturn,
@@ -13,15 +13,17 @@ import {
   calculateReturnSubtotalCents,
   type ReturnReason,
 } from "../lib/money";
+import { RETURN_STEPS, type ReturnStep } from "../lib/steps";
+import { validateReturnStep } from "../lib/validation";
+import {
+  enqueueReturn,
+  type ExchangeSelection,
+} from "../lib/offlineQueue";
+import { useReturnDraftStore } from "../store/returnDraftStore";
+import { flushReturnQueue } from "../lib/flushQueue";
 
-export type ReturnStep = "items" | "reason" | "resolution" | "review";
-
-export const RETURN_STEPS: { id: ReturnStep; label: string }[] = [
-  { id: "items", label: "Items" },
-  { id: "reason", label: "Reason" },
-  { id: "resolution", label: "Resolution" },
-  { id: "review", label: "Review" },
-];
+export type { ReturnStep };
+export { RETURN_STEPS };
 
 function initialQuantities(items: OrderItem[]): Record<string, number> {
   return Object.fromEntries(
@@ -30,29 +32,54 @@ function initialQuantities(items: OrderItem[]): Record<string, number> {
 }
 
 export function useReturnFlow(order: Order | null) {
+  const saveDraft = useReturnDraftStore((s) => s.saveDraft);
+  const clearDraft = useReturnDraftStore((s) => s.clearDraft);
+  const getDraft = useReturnDraftStore((s) => s.getDraft);
+
   const [stepIndex, setStepIndex] = useState(0);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [reason, setReason] = useState<ReturnReason | "">("");
   const [comment, setComment] = useState("");
   const [resolution, setResolution] = useState<ReturnResolution | null>(null);
+  const [exchangeSelections, setExchangeSelections] = useState<
+    Record<string, ExchangeSelection>
+  >({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitNotice, setSubmitNotice] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<ReturnReceipt | null>(null);
+  const [restored, setRestored] = useState(false);
+  const hydratedRef = useRef(false);
 
   const orderId = order?.id;
 
   useEffect(() => {
-    if (!order) return;
-    setQuantities(initialQuantities(order.items));
-    setStepIndex(0);
-    setReason("");
-    setComment("");
-    setResolution(null);
+    if (!order || !orderId) return;
+    const draft = getDraft(orderId);
+    if (draft && draft.orderId === orderId) {
+      setQuantities(draft.quantities);
+      setStepIndex(draft.stepIndex);
+      setReason(draft.reason);
+      setComment(draft.comment);
+      setResolution(draft.resolution);
+      setExchangeSelections(draft.exchangeSelections ?? {});
+      setRestored(true);
+    } else {
+      setQuantities(initialQuantities(order.items));
+      setStepIndex(0);
+      setReason("");
+      setComment("");
+      setResolution(null);
+      setExchangeSelections({});
+      setRestored(false);
+    }
     setFieldErrors({});
     setSubmitError(null);
+    setSubmitNotice(null);
     setReceipt(null);
-  }, [order, orderId]);
+    hydratedRef.current = true;
+  }, [order, orderId, getDraft]);
 
   const eligibleItems = useMemo(
     () => order?.items.filter((item) => item.returnEligible) ?? [],
@@ -85,78 +112,173 @@ export function useReturnFlow(order: Order | null) {
 
   const step = RETURN_STEPS[stepIndex]?.id ?? "items";
 
+  // Persist in-progress return across refresh
+  useEffect(() => {
+    if (!orderId || !hydratedRef.current || receipt) return;
+    saveDraft({
+      orderId,
+      stepIndex,
+      quantities,
+      reason,
+      comment,
+      resolution,
+      exchangeSelections,
+    });
+  }, [
+    orderId,
+    stepIndex,
+    quantities,
+    reason,
+    comment,
+    resolution,
+    exchangeSelections,
+    receipt,
+    saveDraft,
+  ]);
+
   const setItemQuantity = (itemId: string, quantity: number) => {
     const item = eligibleItems.find((i) => i.id === itemId);
     if (!item) return;
     const next = Math.max(0, Math.min(item.quantity, quantity));
     setQuantities((prev) => ({ ...prev, [itemId]: next }));
+    if (next === 0) {
+      setExchangeSelections((prev) => {
+        const copy = { ...prev };
+        delete copy[itemId];
+        return copy;
+      });
+    }
   };
 
-  const validateStep = (current: ReturnStep): boolean => {
-    const errors: Record<string, string> = {};
+  const setExchangeSelection = (
+    itemId: string,
+    patch: Partial<ExchangeSelection>,
+  ) => {
+    setExchangeSelections((prev) => ({
+      ...prev,
+      [itemId]: {
+        size: prev[itemId]?.size ?? "",
+        color: prev[itemId]?.color ?? "",
+        ...patch,
+      },
+    }));
+  };
 
-    if (current === "items") {
-      if (selectedItems.length === 0) {
-        errors.items = "Select at least one eligible item to return.";
-      }
-    }
-
-    if (current === "reason") {
-      if (!reason) {
-        errors.reason = "Please tell us why you're returning these items.";
-      }
-    }
-
-    if (current === "resolution") {
-      if (!resolution) {
-        errors.resolution = "Choose how you'd like us to resolve this return.";
-      }
-    }
-
+  const runValidation = (current: ReturnStep): boolean => {
+    const errors = validateReturnStep({
+      step: current,
+      selectedCount: selectedItems.length,
+      reason,
+      resolution,
+      exchangeSelections,
+      selectedItems: selectedItems.map(({ item }) => item),
+    });
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const goNext = () => {
-    if (!validateStep(step)) return;
+    if (!runValidation(step)) return;
     setStepIndex((i) => Math.min(i + 1, RETURN_STEPS.length - 1));
   };
 
   const goBack = () => {
     setFieldErrors({});
     setSubmitError(null);
+    setSubmitNotice(null);
     setStepIndex((i) => Math.max(i - 1, 0));
   };
 
+  const buildRequest = useCallback(() => {
+    if (!order || !resolution || !reason) return null;
+    return {
+      orderId: order.id,
+      items: selectedItems.map(({ item, quantity }) => ({
+        itemId: item.id,
+        quantity,
+      })),
+      reason:
+        resolution === "exchange"
+          ? `${reason} | Exchange prefs: ${selectedItems
+              .map(({ item }) => {
+                const sel = exchangeSelections[item.id];
+                return `${item.name}=${sel?.size ?? "?"}/${sel?.color ?? "?"}`;
+              })
+              .join("; ")}`
+          : reason,
+      resolution,
+      comment: comment.trim() || undefined,
+    };
+  }, [
+    order,
+    resolution,
+    reason,
+    selectedItems,
+    exchangeSelections,
+    comment,
+  ]);
+
   const submit = async () => {
     if (!order || !resolution || !reason) return;
-    if (selectedItems.length === 0) {
-      setFieldErrors({ items: "Select at least one eligible item to return." });
-      setStepIndex(0);
+    if (!runValidation("items") || !runValidation("reason") || !runValidation("resolution")) {
       return;
     }
 
+    const request = buildRequest();
+    if (!request) return;
+
     setSubmitting(true);
     setSubmitError(null);
+    setSubmitNotice(null);
+
+    // Offline-friendly queue
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      const queuedId = `queued_${Date.now().toString(36)}`;
+      enqueueReturn({
+        id: queuedId,
+        createdAt: new Date().toISOString(),
+        request,
+        exchangeSelections,
+      });
+      clearDraft(order.id);
+      setReceipt({
+        returnId: queuedId,
+        createdAt: new Date().toISOString(),
+      });
+      setSubmitNotice(
+        "You're offline — we saved this return and will submit it when you're back online.",
+      );
+      setSubmitting(false);
+      return;
+    }
+
+    // Optimistic receipt id while the network call is in flight
+    const optimisticId = `pending_${Date.now().toString(36)}`;
+    setSubmitNotice("Submitting your return…");
 
     try {
-      const result = await submitReturn({
-        orderId: order.id,
-        items: selectedItems.map(({ item, quantity }) => ({
-          itemId: item.id,
-          quantity,
-        })),
-        reason,
-        resolution,
-        comment: comment.trim() || undefined,
-      });
+      const result = await submitReturn(request);
+      clearDraft(order.id);
       setReceipt(result);
+      setSubmitNotice(null);
+      void flushReturnQueue();
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
           ? err.message
           : "We couldn't submit your return. Please try again.";
-      setSubmitError(message);
+
+      // Queue for retry so the shopper doesn't lose work on flaky networks
+      enqueueReturn({
+        id: optimisticId,
+        createdAt: new Date().toISOString(),
+        request,
+        exchangeSelections,
+      });
+      setSubmitError(
+        `${message} We've also saved this return locally and will retry automatically when possible.`,
+      );
+      setSubmitNotice(null);
     } finally {
       setSubmitting(false);
     }
@@ -177,6 +299,8 @@ export function useReturnFlow(order: Order | null) {
     setComment,
     resolution,
     setResolution,
+    exchangeSelections,
+    setExchangeSelection,
     subtotalCents,
     resolutionAmountCents,
     fieldErrors,
@@ -185,6 +309,9 @@ export function useReturnFlow(order: Order | null) {
     submit,
     submitting,
     submitError,
+    submitNotice,
     receipt,
+    restored,
+    dismissRestored: () => setRestored(false),
   };
 }

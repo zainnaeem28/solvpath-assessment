@@ -1,0 +1,51 @@
+.exchange-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.exchange-picker__help {
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.exchange-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.exchange-picker__row {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.exchange-picker__name {
+  font-weight: 700;
+}
+
+.exchange-picker__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.exchange-picker__stock,
+.exchange-picker__error {
+  font-size: 0.875rem;
+  color: var(--danger);
+}
+
+@media (max-width: 560px) {
+  .exchange-picker__fields {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,81 +1,84 @@
 # solvpath — Senior Front-End take-home
 
-Customer-facing slice of a post-purchase experience: browse orders, then start a guided return / exchange.
+Customer-facing post-purchase slice: sign in, browse orders, and complete a guided return / exchange — including draft persistence, exchange inventory selection, offline submit queue, tests, and Storybook.
 
-**Stack:** React 19 · TypeScript · Vite · React Router · CSS (brand tokens)
+**Stack:** React 19 · TypeScript · Vite · React Router · Zustand · Vitest · Storybook · CSS (brand tokens)
 
 ## Install → run
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run dev
 ```
 
 Open the URL Vite prints (usually `http://localhost:5173`).
 
 ```bash
-npm run build    # production build
-npm run preview  # serve the build
+npm run build           # production build
+npm run preview         # serve the build
+npm test                # Vitest unit tests
+npm run storybook       # component explorer on :6006
 ```
+
+### Demo accounts
+
+| Name | Email |
+|------|--------|
+| Maya Chen | `maya.chen@example.com` |
+| Jordan Lee | `jordan.lee@example.com` |
+
+No password — pick a demo email on `/login`.
 
 ## What's included
 
-1. **Orders dashboard** — paginated list (page size 4), status filter, search by order number or product name, loading / empty / error + retry.
-2. **Return / exchange flow** — items → reason → resolution → review → submit, against the provided mock API (latency + intermittent failures).
-
-Money is handled in **integer cents**. Store credit applies a **+10% bonus** (`Math.round(subtotal * 1.1)`).
+1. **Auth / accounts** — mock sign-in, persisted session (Zustand), protected routes, header account + sign out.
+2. **Orders dashboard** — paginated list (page size 4), status filter, search, loading / empty / error + retry.
+3. **Return / exchange flow** — items → reason → resolution → review → submit.
+4. **Draft persistence** — in-progress returns survive refresh (localStorage via Zustand).
+5. **Exchange inventory** — size + color selection with out-of-stock combinations disabled.
+6. **Money math** — integer cents; store credit applies **+10%** (`Math.round(subtotal * 1.1)`).
+7. **Offline / flaky submit** — queues returns locally and flushes on `online` / next visit; optimistic messaging while submitting.
+8. **A11y** — step live region + focus move to the step heading on change.
+9. **Tests** — Vitest coverage for money helpers, step validation, and auth lookup.
+10. **Storybook** — atoms/molecules (Button, Badge, SearchField, ErrorBanner, Pagination).
 
 ## Architecture
 
-Hybrid structure — **feature modules first**, with a light **atomic UI layer** for shared presentational pieces:
+Hybrid: **feature modules first**, light **atomic UI** for shared presentational pieces.
 
 ```text
 src/
-├── api/mockApi.ts              # starter mock backend (behavior unchanged)
-├── components/
-│   ├── atoms/                  # Button, Input, Badge, …
-│   ├── molecules/              # SearchField, Pagination, ErrorBanner, …
-│   ├── organisms/              # AppHeader
-│   └── templates/              # AppShell layout
+├── api/mockApi.ts                 # starter mock backend (behavior unchanged)
+├── components/{atoms,molecules,organisms,templates}
 ├── features/
-│   ├── orders/                 # dashboard UI + data hooks
-│   └── returns/                # wizard UI + money helpers + flow state
-├── pages/                      # route-level composition
-├── hooks/                      # shared utilities (abort controller)
-└── styles/                     # brand tokens + global styles
+│   ├── auth/                      # accounts, login, RequireAuth, Zustand session
+│   ├── orders/                    # dashboard + data hooks
+│   └── returns/                   # wizard, money, validation, drafts, offline queue
+├── pages/
+├── hooks/
+└── styles/
 ```
-
-Atoms/molecules stay presentational (props in → UI out). Data fetching, validation, and money math live in `features/*`.
 
 ## Decision log
 
 ### Chose to build
-- End-to-end orders + return flow against `listOrders` / `getOrder` / `submitReturn`
-- Abortable fetches with retry on failure (mock API fails ~12% / ~25%)
-- Step validation before advancing; sticky action bar on the return flow
-- Responsive layout using the required solvpath palette + Inter
-- Deferred search input (`useDeferredValue`) so typing stays responsive while requests settle
-- Explicit empty / loading / error states as product UI, not afterthoughts
-
-### Deliberately skipped
-- Auth / accounts
-- Storybook / exhaustive unit tests (time budget)
-- Persisting an in-progress return across refresh
-- Exchange inventory / size selection beyond the resolution choice
+- Full brief requirements end-to-end against `listOrders` / `getOrder` / `submitReturn`
+- Auth gate so the app feels like a real post-purchase account surface
+- Zustand for session + return drafts (small global state with persistence)
+- Exchange size/color inventory as part of the resolution step
+- Abortable fetches, retries, offline queue flush on reconnect
+- Deferred search (`useDeferredValue`), wizard focus + `aria-live`
+- Vitest for the fiddly correctness bits; Storybook for the shared UI kit
 
 ### Trade-offs
-- **No global state library** — URL + local component/hook state is enough for two screens; Zustand would be overkill here.
-- **CSS modules via co-located plain CSS** instead of Tailwind — keeps brand tokens as CSS variables (as provided) and avoids theme mapping noise in a short exercise.
-- **Feature folders over pure Atomic Design** — Atomic naming is used only for the shared UI kit; domain logic is colocated under `features/` so returns money math and order fetching stay discoverable.
-- Left `apiConfig` failure rates at starter values so reviewers see real failure handling (retry on list + submit).
+- **Mock auth** (email-only demo accounts) instead of OAuth — no real backend in the kit
+- **Exchange prefs encoded into the return `reason` string** when submitting — the mock `ReturnRequest` type has no dedicated field for size/color; called out here rather than silently dropping data
+- **CSS co-located with components** (not Tailwind) so brand tokens stay CSS variables as provided
+- **Feature folders + atomic shared UI** — domain logic stays under `features/`; atoms/molecules stay presentational
+- **Storybook peer deps** — install with `npm install --legacy-peer-deps` because Storybook 9’s peer range lags Vite 8
+- Left `apiConfig` failure rates at starter values so failure/retry UX is reviewable
 
-### With another day
-- Vitest coverage for `calculateStoreCreditCents` / step validation
-- Optimistic UI + offline-friendly queue for submit
-- Announced live regions for step changes; stronger focus management in the wizard
-- Storybook for atoms/molecules
-
-## Notes for reviewers
-
-- Starter assets live at the repo root (`mockApi.ts`, `brand-tokens.css`, `solvpath-logo.png`, `CANDIDATE_BRIEF.pdf`). The app imports copies under `src/` — **mock API behavior was not changed**.
-- Return is only offered for **delivered** orders, matching the brief.
+### Notes for reviewers
+- Starter assets remain at the repo root (`mockApi.ts`, `brand-tokens.css`, `solvpath-logo.png`, `CANDIDATE_BRIEF.pdf`). The app imports copies under `src/` — **mock API behavior was not changed**.
+- Returns are only offered for **delivered** orders.
+- Refresh mid-return to verify draft restore; toggle DevTools offline to exercise the queue.

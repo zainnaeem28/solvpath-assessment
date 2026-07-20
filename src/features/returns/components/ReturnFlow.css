@@ -134,3 +134,34 @@
   border-radius: var(--radius-card);
   backdrop-filter: blur(8px);
 }
+
+.return-flow__restored {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-card);
+  border: 1px solid rgb(40 176 200 / 35%);
+  background: var(--accent-soft);
+  font-size: 0.875rem;
+}
+
+.return-flow__notice {
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-control);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.875rem;
+}
+
+.return-flow__step h2:focus {
+  outline: none;
+}
+
+.return-flow__step h2:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
